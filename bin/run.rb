@@ -1,35 +1,53 @@
-require "open-uri"
 require "jar_dependencies"
 
 Jars.require_jars_lock!
 
+class HttpHandler
+  include org.apache.maven.index.reader.ResourceHandler
 
-class Handler < org.apache.maven.index.reader.ResourceHandler
-  def initialize(url)
-    @url = url
-    @data = open(@url, "User-Agent" => "Testing")
+  def initialize(base)
+    @base = java.net.URI.new(base)
   end
 
-  def read()
-    @stream if defined?(@stream)
-    @stream = java.io.ByteArrayInputStream.new(@data.to_bytes)
+  def locate(name)
+    HttpResource.new(@base, name)
   end
 
-  def close()
-    @stream.close
+  def close; end
+end
+
+class HttpResource
+  include org.apache.maven.index.reader.ResourceHandler::Resource
+
+  def initialize(base, name)
+    @base = base
+    @name = name
   end
+
+  def read
+    target = @base.resolve(@name).toURL
+
+    conn = target.openConnection
+    conn.setRequestMethod("GET")
+    conn.setRequestProperty("User-Agent", "Testing")
+
+    java.io.BufferedInputStream.new(conn.getInputStream)
+  end
+
+  def close; end
 end
 
 def main
-  url = "https://repo1.maven.org/maven2/.index/nexus-maven-repository-index.properties"
-  rs = ::Resource.new(url)
-  props = org.apache.maven.index.reader.Utils.loadProperties(rs.read)
-  File.open("./nexus-maven-repository-index.properties", "w") do |f|
-    org.apache.maven.index.reader.Utils.storeProperties(f.to_outputstream, props)
-  end
+  url = "https://repo1.maven.org/maven2/.index/"
+  #local = FileHandler.new(".")
+  remote = HttpHandler.new(url)
 
-  remote = org.apache.maven.index.reader.HttpResourceHandler.new(url)
+  puts "Creating Index Reader..."
   reader = org.apache.maven.index.reader.IndexReader.new(nil, remote)
+  puts "ID: #{reader.getIndexId}"
+  puts "Timestamp: #{reader.getPublishedTimestamp}"
+  puts "Chunk Names: #{reader.getChunkNames}"
+  puts
 end
 
 main
