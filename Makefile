@@ -5,9 +5,10 @@ all: build run
 
 .PHONY: build
 build:
-	@docker build -t elireisman/jruby-ssl-repro:latest .
+	docker build -t elireisman/jruby-ssl-repro:latest .
 
 .PHONY: run
 run:
-	@docker run -it elireisman/jruby-ssl-repo:latest /bin/bash
+	docker run -t elireisman/jruby-ssl-repro:latest
+	#@docker run -it elireisman/jruby-ssl-repo:latest /bin/bash
 

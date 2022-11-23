@@ -1,0 +1,5 @@
+---
+:runtime:
+- org.apache.maven.indexer:indexer-reader:jar:6.0.0
+- org.yaml:snakeyaml:jar:1.31
+- jline:jline:jar:2.11
