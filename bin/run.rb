@@ -39,7 +39,6 @@ end
 
 def main
   url = "https://repo1.maven.org/maven2/.index/"
-  #local = FileHandler.new(".")
   remote = HttpHandler.new(url)
 
   puts "Creating Index Reader..."
