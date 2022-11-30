@@ -12,7 +12,9 @@ RUN warble runnable jar
 
 FROM ubuntu:20.04 AS run
 
-RUN apt update -y && apt install -y vim curl openjdk-17-jre ca-certificates-java
-COPY --from=build /jruby-ssl-repro/jruby-ssl-repro.jar ./
+RUN groupadd -g 621 foo && useradd -r -u 621 -g foo bar
+RUN apt-get update -y && apt-get install -y vim curl openjdk-17-jre ca-certificates-java
+
+COPY --chown=bar:foo --from=build /jruby-ssl-repro/jruby-ssl-repro.jar ./
 
 ENTRYPOINT ["java", "-jar", "jruby-ssl-repro.jar"]

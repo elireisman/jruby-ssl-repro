@@ -10,5 +10,4 @@ build:
 .PHONY: run
 run:
 	docker run -t elireisman/jruby-ssl-repro:latest
-	#@docker run -it elireisman/jruby-ssl-repo:latest /bin/bash
 
