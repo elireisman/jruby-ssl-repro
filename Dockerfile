@@ -12,9 +12,13 @@ RUN warble runnable jar
 
 FROM ubuntu:20.04 AS run
 
+# default CA cert store is missing on the image this repro is simulating
+RUN rm -rf /etc/ssl/certs/java/cacerts
+
 RUN groupadd -g 621 foo && useradd -r -u 621 -g foo bar
 RUN apt-get update -y && apt-get install -y vim curl openjdk-17-jre ca-certificates-java
 
 COPY --chown=bar:foo --from=build /jruby-ssl-repro/jruby-ssl-repro.jar ./
 
+USER bar
 ENTRYPOINT ["java", "-jar", "jruby-ssl-repro.jar"]
